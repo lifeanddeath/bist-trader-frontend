@@ -8,7 +8,7 @@ import {
   CountData 
 } from '../types';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'https://bist-trader-production.up.railway.app';
+const API_BASE = process.env.REACT_APP_API_URL || 'https://web-production-beb022.up.railway.app';
 
 class ApiService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

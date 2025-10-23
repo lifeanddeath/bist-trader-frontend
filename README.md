@@ -1,46 +1,175 @@
-# Getting Started with Create React App
+# BIST Signal Finder Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Modern, minimal ve şık bir React frontend uygulaması. BIST hisse senedi analizi için geliştirilmiş backend API'si ile entegre çalışır.
 
-## Available Scripts
+## 🚀 Özellikler
 
-In the project directory, you can run:
+- **Modern UI/UX**: Material-UI ile tasarlanmış minimal ve şık arayüz
+- **Responsive Design**: Tüm cihazlarda mükemmel görünüm
+- **Real-time Data**: Canlı veri güncellemeleri
+- **Interactive Dashboard**: Kapsamlı analiz dashboard'u
+- **TypeScript**: Tip güvenli kod yapısı
 
-### `npm start`
+## 📊 Sayfalar
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Dashboard
+- Genel istatistikler
+- API durumu
+- Analiz durumu
+- Son analiz bilgileri
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Sinyaller
+- Mükemmel sinyal veren hisseler
+- Detaylı fiyat bilgileri
+- Alım sinyalleri listesi
+- Analiz başlatma/durdurma
 
-### `npm test`
+### Formasyonlar
+- Tespit edilen formasyonlar
+- Risk/ödül analizi
+- Güvenilirlik skorları
+- Detaylı formasyon bilgileri
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### En İyi Seçimler
+- En yüksek potansiyelli 2 hisse
+- Seçim kriterleri
+- Skorlama sistemi
+- Seçim nedenleri
 
-### `npm run build`
+## 🛠️ Teknolojiler
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **React 18** - Modern React hooks
+- **TypeScript** - Tip güvenliği
+- **Material-UI** - UI bileşenleri
+- **Axios** - HTTP istekleri
+- **Recharts** - Grafik görselleştirme
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 Kurulum
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# Bağımlılıkları yükle
+npm install
 
-### `npm run eject`
+# Geliştirme sunucusunu başlat
+npm start
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# Production build
+npm run build
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🔧 Yapılandırma
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+API base URL'i `src/services/api.ts` dosyasında yapılandırılabilir:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```typescript
+const API_BASE = 'http://localhost:8080';
+```
 
-## Learn More
+## 📱 Responsive Tasarım
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Mobile First**: Mobil cihazlar için optimize edilmiş
+- **Tablet Support**: Tablet görünümü için özel düzenlemeler
+- **Desktop**: Geniş ekranlar için maksimum verimlilik
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🎨 Tasarım Sistemi
+
+### Renkler
+- **Primary**: #2563eb (Mavi)
+- **Secondary**: #10b981 (Yeşil)
+- **Success**: #10b981
+- **Warning**: #f59e0b
+- **Error**: #ef4444
+
+### Tipografi
+- **Font**: Inter (Google Fonts)
+- **Weights**: 300, 400, 500, 600, 700
+
+### Spacing
+- **xs**: 4px
+- **sm**: 8px
+- **md**: 16px
+- **lg**: 24px
+- **xl**: 32px
+
+## 🔄 API Entegrasyonu
+
+### Endpoints
+- `GET /api/signals` - Tüm sinyaller
+- `GET /api/formations` - Formasyonlar
+- `GET /api/top-picks` - En iyi seçimler
+- `POST /api/analysis/start` - Analiz başlat
+- `GET /api/analysis/status` - Analiz durumu
+
+### Hata Yönetimi
+- Otomatik hata yakalama
+- Kullanıcı dostu hata mesajları
+- Retry mekanizması
+
+## 📈 Performans
+
+- **Lazy Loading**: Sayfa bazında kod bölme
+- **Memoization**: Gereksiz render'ları önleme
+- **Optimized Images**: Optimize edilmiş görseller
+- **Bundle Size**: Minimal bundle boyutu
+
+## 🔒 Güvenlik
+
+- **CORS**: Cross-origin istek yönetimi
+- **Input Validation**: Giriş doğrulama
+- **XSS Protection**: XSS saldırı koruması
+
+## 🧪 Test
+
+```bash
+# Testleri çalıştır
+npm test
+
+# Coverage raporu
+npm run test:coverage
+```
+
+## 📦 Build
+
+```bash
+# Production build
+npm run build
+
+# Build analizi
+npm run analyze
+```
+
+## 🚀 Deployment
+
+### Vercel
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+### Netlify
+```bash
+npm run build
+# dist/ klasörünü Netlify'a yükle
+```
+
+## 🤝 Katkıda Bulunma
+
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit yapın (`git commit -m 'Add amazing feature'`)
+4. Push yapın (`git push origin feature/amazing-feature`)
+5. Pull Request oluşturun
+
+## 📄 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır.
+
+## 📞 İletişim
+
+- **Email**: [email@example.com]
+- **GitHub**: [@username]
+- **LinkedIn**: [linkedin.com/in/username]
+
+---
+
+**Not**: Bu uygulama BIST hisse senedi analizi için geliştirilmiştir. Yatırım kararları alırken profesyonel finansal danışmanlık alınması önerilir.

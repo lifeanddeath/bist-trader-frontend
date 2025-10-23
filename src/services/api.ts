@@ -74,6 +74,12 @@ class ApiService {
     });
   }
 
+  async startSignalAnalysis(): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/api/signals/start', {
+      method: 'POST',
+    });
+  }
+
   // Status
   async getStatus(): Promise<StatusData> {
     return this.request<StatusData>('/api/status');

@@ -122,18 +122,19 @@ class ApiService {
   }
 
   // Latest Signals (New API)
+  // REACT_APP_API_URL=/api olduğu için endpoint'te /api/ prefix'i yok
   async getLatestSignals(): Promise<LatestSignalsResponse> {
-    return this.directRequest<LatestSignalsResponse>('/api/latest-signals');
+    return this.directRequest<LatestSignalsResponse>('/latest-signals');
   }
 
   // Signals History (Optional)
   async getSignalsHistory(limit: number = 10): Promise<{ count: number; data: LatestSignalsResponse[] }> {
-    return this.directRequest<{ count: number; data: LatestSignalsResponse[] }>(`/api/signals-history?limit=${limit}`);
+    return this.directRequest<{ count: number; data: LatestSignalsResponse[] }>(`/signals-history?limit=${limit}`);
   }
 
   // Manual Signal Finder Run (Test)
   async runSignalFinder(): Promise<{ message: string }> {
-    return this.directRequest<{ message: string }>('/api/run-signal-finder', {
+    return this.directRequest<{ message: string }>('/run-signal-finder', {
       method: 'POST',
     });
   }

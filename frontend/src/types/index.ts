@@ -107,3 +107,15 @@ export interface DashboardData {
   perfect_signals_count: number;
   stocks: Stock[];
 }
+
+// Latest Signals Response (New API Format)
+// Frontend sadece API'den okur, database'e direkt bağlanmaz
+export interface LatestSignalsResponse {
+  id?: number;
+  timestamp: string;
+  total_analyzed: number;
+  perfect_signals_count: number;
+  stocks: Stock[];
+  created_at?: string;
+  message?: string;
+}

@@ -6,10 +6,12 @@ import {
   AnalysisStatus, 
   StatusData, 
   CountData,
-  DashboardData
+  DashboardData,
+  LatestSignalsResponse
 } from '../types';
 
-const API_BASE = process.env.REACT_APP_API_URL || '';
+// API Base URL: local için 8000, Docker için backend:8000
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 class ApiService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -37,6 +39,34 @@ class ApiService {
       console.error(`API request failed for ${endpoint}:`, error);
       throw error;
     }
+  }
+
+  // Direct request without ApiResponse wrapper (for new API format)
+  private async directRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+        ...options,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data as T;
+    } catch (error) {
+      console.error(`API request failed for ${endpoint}:`, error);
+      throw error;
+    }
+  }
+
+  // Health Check
+  async getHealth(): Promise<{ status: string; timestamp: string }> {
+    return this.directRequest<{ status: string; timestamp: string }>('/health');
   }
 
   // Signals
@@ -86,9 +116,26 @@ class ApiService {
     return this.request<StatusData>('/api/status');
   }
 
-  // Dashboard
+  // Dashboard (Legacy)
   async getDashboard(): Promise<DashboardData> {
     return this.request<DashboardData>('/api/dashboard');
+  }
+
+  // Latest Signals (New API)
+  async getLatestSignals(): Promise<LatestSignalsResponse> {
+    return this.directRequest<LatestSignalsResponse>('/api/latest-signals');
+  }
+
+  // Signals History (Optional)
+  async getSignalsHistory(limit: number = 10): Promise<{ count: number; data: LatestSignalsResponse[] }> {
+    return this.directRequest<{ count: number; data: LatestSignalsResponse[] }>(`/api/signals-history?limit=${limit}`);
+  }
+
+  // Manual Signal Finder Run (Test)
+  async runSignalFinder(): Promise<{ message: string }> {
+    return this.directRequest<{ message: string }>('/api/run-signal-finder', {
+      method: 'POST',
+    });
   }
 }
 

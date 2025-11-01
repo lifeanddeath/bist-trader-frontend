@@ -5,11 +5,12 @@ import {
   CardContent,
   Typography,
   Chip,
+  LinearProgress,
 } from '@mui/material';
-import { useDashboard } from '../hooks/useApi';
+import { useLatestSignals } from '../hooks/useApi';
 
 export default function Dashboard() {
-  const { data } = useDashboard();
+  const { data, loading, error } = useLatestSignals();
 
   // Örnek veriler - API'den veri gelmediğinde gösterilecek
   const exampleStocks = [
@@ -47,21 +48,28 @@ export default function Dashboard() {
   };
 
   // Örnek veri veya gerçek veri kullan
-  const displayData = data && data.stocks && data.stocks.length > 0 ? data : exampleData;
+  // Yeni API formatında stocks direkt response'da geliyor
+  const displayData = data && data.stocks && data.stocks.length > 0 ? {
+    timestamp: data.timestamp || data.created_at || new Date().toISOString(),
+    total_analyzed: data.total_analyzed || 0,
+    perfect_signals_count: data.perfect_signals_count || 0,
+    stocks: data.stocks || [],
+  } : exampleData;
 
   const formatPrice = (price: number) => `₺${price.toFixed(2)}`;
 
   const formatDate = (dateString: string) => {
     // JSON response'dan gelen timestamp'i direkt parse et
-    // Format: "2025-11-01T16:16:22.319957"
+    // Format: "2024-11-01T16:14:35.799861"
     const parts = dateString.split('T');
     if (parts.length !== 2) return dateString;
     
-    const datePart = parts[0]; // "2025-11-01"
-    const timePart = parts[1]; // "16:16:22.319957"
+    const datePart = parts[0]; // "2024-11-01"
+    const timePart = parts[1]; // "16:14:35.799861"
     
     const [year, month, day] = datePart.split('-');
-    const [hour, minute] = timePart.split(':');
+    const [hour, minute, second] = timePart.split(':');
+    const seconds = second ? second.split('.')[0] : '00';
     
     const monthNames = [
       'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
@@ -70,8 +78,11 @@ export default function Dashboard() {
     
     const monthIndex = parseInt(month, 10) - 1;
     const monthName = monthNames[monthIndex] || month;
+    const dayNum = parseInt(day, 10);
+    const yearNum = parseInt(year, 10);
     
-    return `${parseInt(day, 10)} ${monthName} ${hour}:${minute}`;
+    // Format: "01 Kasım 2024, 16:14:35"
+    return `${dayNum.toString().padStart(2, '0')} ${monthName} ${yearNum}, ${hour}:${minute}:${seconds}`;
   };
 
   return (
@@ -97,7 +108,38 @@ export default function Dashboard() {
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
           >
-            En Son Güncelleme: {formatDate(displayData.timestamp)}
+            Son Güncelleme: {formatDate(displayData.timestamp)}
+          </Typography>
+        </Box>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <Box sx={{ mb: 3 }}>
+          <LinearProgress sx={{ mb: 2 }} />
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+            Veriler yükleniyor...
+          </Typography>
+        </Box>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Box sx={{ mb: 3, p: 2, backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 2, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+          <Typography variant="body2" sx={{ color: '#ef4444', fontWeight: 600 }}>
+            ⚠️ API bağlantı hatası: {error}. Örnek veriler gösteriliyor.
+          </Typography>
+        </Box>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && data && data.message === 'No signals found' && (
+        <Box sx={{ mb: 3, p: 3, backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: 2, textAlign: 'center' }}>
+          <Typography variant="body1" color="text.secondary" gutterBottom>
+            Henüz sinyal bulunmuyor
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Backend analiz tamamlandığında hisseler burada görünecek
           </Typography>
         </Box>
       )}

@@ -10,8 +10,8 @@ import {
   LatestSignalsResponse
 } from '../types';
 
-// API Base URL: local için 8000, Docker için backend:8000
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// API Base URL: nginx proxy kullandığımız için boş (nginx /api/ path'ini backend'e yönlendirir)
+const API_BASE = process.env.REACT_APP_API_URL || '';
 
 class ApiService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

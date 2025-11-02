@@ -112,10 +112,13 @@ export interface DashboardData {
 // Frontend sadece API'den okur, database'e direkt bağlanmaz
 export interface LatestSignalsResponse {
   id?: number;
+  signal_type?: 'standard' | 'relaxed';
   timestamp: string;
   total_analyzed: number;
   perfect_signals_count: number;
   stocks: Stock[];
   created_at?: string;
   message?: string;
+  total_count?: number; // Legacy support
+  last_analysis?: string; // Legacy support
 }

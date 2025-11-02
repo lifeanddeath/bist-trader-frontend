@@ -258,3 +258,60 @@ export function useLatestSignals() {
 
   return { data, loading, error, refetch: fetchLatestSignals };
 }
+
+// Latest Relaxed Signals Hook (New API - 5 dakikada bir otomatik refresh)
+export function useLatestSignalsRelaxed() {
+  const [data, setData] = useState<LatestSignalsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchLatestSignalsRelaxed = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Frontend sadece backend API'yi kullanır, database'e direkt bağlanmaz
+      const signalsData = await apiService.getLatestSignalsRelaxed();
+      
+      // Eğer message varsa ve "No signals found" ise boş stocks array döndür
+      if (signalsData.message === 'No signals found' || !signalsData.stocks || signalsData.stocks.length === 0) {
+        setData({
+          timestamp: new Date().toISOString(),
+          total_analyzed: 0,
+          perfect_signals_count: 0,
+          stocks: [],
+          message: 'No signals found',
+        });
+      } else {
+        // Response'dan direkt stocks array'i al (backend API'den geliyor)
+        const stocks = signalsData.stocks || [];
+        const timestamp = signalsData.timestamp || signalsData.created_at || new Date().toISOString();
+        
+        setData({
+          ...signalsData,
+          stocks,
+          timestamp,
+        });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
+      console.error('Latest relaxed signals fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // İlk yükleme
+    fetchLatestSignalsRelaxed();
+    
+    // Her 5 dakikada bir otomatik refresh (5 * 60 * 1000 ms)
+    const interval = setInterval(() => {
+      fetchLatestSignalsRelaxed();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [fetchLatestSignalsRelaxed]);
+
+  return { data, loading, error, refetch: fetchLatestSignalsRelaxed };
+}

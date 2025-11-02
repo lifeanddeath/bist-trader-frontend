@@ -93,7 +93,9 @@ function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'signals':
-        return <Signals />;
+        return <Signals signalType="standard" />;
+      case 'signals-relaxed':
+        return <Signals signalType="relaxed" />;
       case 'formations':
         return <Formations />;
       case 'top-picks':

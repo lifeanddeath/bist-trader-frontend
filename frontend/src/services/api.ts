@@ -124,17 +124,30 @@ class ApiService {
   // Latest Signals (New API)
   // REACT_APP_API_URL=/api olduğu için endpoint'te /api/ prefix'i yok
   async getLatestSignals(): Promise<LatestSignalsResponse> {
-    return this.directRequest<LatestSignalsResponse>('/latest-signals');
+    return this.directRequest<LatestSignalsResponse>('/api/latest-signals');
+  }
+
+  // Latest Relaxed Signals (New API)
+  async getLatestSignalsRelaxed(): Promise<LatestSignalsResponse> {
+    return this.directRequest<LatestSignalsResponse>('/api/latest-signals-relaxed');
   }
 
   // Signals History (Optional)
-  async getSignalsHistory(limit: number = 10): Promise<{ count: number; data: LatestSignalsResponse[] }> {
-    return this.directRequest<{ count: number; data: LatestSignalsResponse[] }>(`/signals-history?limit=${limit}`);
+  async getSignalsHistory(limit: number = 10, signalType?: string): Promise<{ count: number; signal_type: string; data: LatestSignalsResponse[] }> {
+    const typeParam = signalType ? `&signal_type=${signalType}` : '';
+    return this.directRequest<{ count: number; signal_type: string; data: LatestSignalsResponse[] }>(`/api/signals-history?limit=${limit}${typeParam}`);
   }
 
   // Manual Signal Finder Run (Test)
-  async runSignalFinder(): Promise<{ message: string }> {
-    return this.directRequest<{ message: string }>('/run-signal-finder', {
+  async runSignalFinder(): Promise<{ success: boolean; message: string; total_signals: number; entry_id: number; timestamp: string }> {
+    return this.directRequest<{ success: boolean; message: string; total_signals: number; entry_id: number; timestamp: string }>('/api/run-signal-finder', {
+      method: 'POST',
+    });
+  }
+
+  // Manual Relaxed Signal Finder Run (Test)
+  async runSignalFinderRelaxed(): Promise<{ success: boolean; message: string; total_signals: number; entry_id: number; timestamp: string }> {
+    return this.directRequest<{ success: boolean; message: string; total_signals: number; entry_id: number; timestamp: string }>('/api/run-signal-finder-relaxed', {
       method: 'POST',
     });
   }

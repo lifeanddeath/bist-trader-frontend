@@ -30,6 +30,7 @@ interface LayoutProps {
 
 const menuItems = [
   { id: 'dashboard', label: 'Dip Bulucu', icon: <DashboardIcon /> },
+  { id: 'signals-relaxed', label: 'Dip Bulucu Biraz Daha Esnetilmiş', icon: <DashboardIcon /> },
 ];
 
 export default function Layout({ children, currentPage, onPageChange }: LayoutProps) {

@@ -23,18 +23,24 @@ import {
   PlayArrow as PlayIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import { useSignals } from '../hooks/useApi';
+import { useLatestSignals, useLatestSignalsRelaxed } from '../hooks/useApi';
 import { apiService } from '../services/api';
 
-export default function Signals() {
-  const { data, loading, error, refetch } = useSignals();
+interface SignalsProps {
+  signalType?: 'standard' | 'relaxed';
+}
+
+export default function Signals({ signalType = 'standard' }: SignalsProps) {
+  const standardSignals = useLatestSignals();
+  const relaxedSignals = useLatestSignalsRelaxed();
+  const { data, loading, error, refetch } = signalType === 'relaxed' ? relaxedSignals : standardSignals;
   const [isStartingAnalysis, setIsStartingAnalysis] = React.useState(false);
   const [analysisProgress, setAnalysisProgress] = React.useState(0);
 
   // Auto-refresh during analysis
   useEffect(() => {
-    let interval: NodeJS.Timeout;
     let progressInterval: NodeJS.Timeout;
+    let refreshInterval: NodeJS.Timeout;
     
     if (isStartingAnalysis) {
       setAnalysisProgress(0);
@@ -47,40 +53,47 @@ export default function Signals() {
         });
       }, 1000);
       
-      // Check for real completion every 3 seconds
-      interval = setInterval(async () => {
-        try {
-          const status = await apiService.getAnalysisStatus();
-          if (!status.is_running) {
-            clearInterval(interval);
-            clearInterval(progressInterval);
-            setAnalysisProgress(100);
-            setTimeout(() => {
-              setIsStartingAnalysis(false);
-              refetch(); // Final refresh
-              // Tüm sayfaları yenile
-              window.location.reload();
-            }, 1000);
-          }
-        } catch (error) {
-          console.error('Analiz durumu kontrol hatası:', error);
-        }
-      }, 3000);
+      // Check for new data every 5 seconds (analysis usually takes 1-2 minutes)
+      refreshInterval = setInterval(() => {
+        refetch();
+      }, 5000);
+      
+      // Auto-complete after 90 seconds (analysis should be done by then)
+      const timeout = setTimeout(() => {
+        clearInterval(progressInterval);
+        clearInterval(refreshInterval);
+        setAnalysisProgress(100);
+        setTimeout(() => {
+          setIsStartingAnalysis(false);
+          refetch(); // Final refresh
+        }, 1000);
+      }, 90000); // 90 seconds timeout
+      
+      return () => {
+        clearInterval(progressInterval);
+        clearInterval(refreshInterval);
+        clearTimeout(timeout);
+      };
     }
     
     return () => {
-      if (interval) clearInterval(interval);
       if (progressInterval) clearInterval(progressInterval);
+      if (refreshInterval) clearInterval(refreshInterval);
     };
   }, [isStartingAnalysis, refetch]);
 
   const handleStartAnalysis = async () => {
     setIsStartingAnalysis(true);
     try {
-      await apiService.startAnalysis();
+      if (signalType === 'relaxed') {
+        await apiService.runSignalFinderRelaxed();
+      } else {
+        await apiService.runSignalFinder();
+      }
+      // Analysis started, progress bar will handle completion
     } catch (error) {
       console.error('Analiz başlatma hatası:', error);
-      alert('Analiz zaten çalışıyor olabilir veya bir hata oluştu. Lütfen birkaç dakika sonra tekrar deneyin.');
+      alert('Analiz başlatılamadı veya bir hata oluştu. Lütfen birkaç dakika sonra tekrar deneyin.');
       setIsStartingAnalysis(false);
     }
   };
@@ -133,7 +146,7 @@ export default function Signals() {
 
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-          BIST Sinyalleri
+          {signalType === 'relaxed' ? 'BIST Sinyalleri (Biraz Daha Esnetilmiş)' : 'BIST Sinyalleri'}
         </Typography>
         <Box>
           <Button
@@ -166,7 +179,7 @@ export default function Signals() {
                   Toplam Sinyal
                 </Typography>
                 <Typography variant="h6" color="primary">
-                  {data.total_count}
+                  {data.perfect_signals_count || data.total_count || 0}
                 </Typography>
               </Box>
               <Box>
@@ -174,7 +187,7 @@ export default function Signals() {
                   Analiz Edilen
                 </Typography>
                 <Typography variant="h6" color="secondary">
-                  {data.total_analyzed}
+                  {data.total_analyzed || 0}
                 </Typography>
               </Box>
               <Box>
@@ -182,7 +195,7 @@ export default function Signals() {
                   Son Analiz
                 </Typography>
                 <Typography variant="body2">
-                  {new Date(data.last_analysis).toLocaleString('tr-TR')}
+                  {data.timestamp ? new Date(data.timestamp).toLocaleString('tr-TR') : 'Henüz analiz yapılmadı'}
                 </Typography>
               </Box>
             </Box>
